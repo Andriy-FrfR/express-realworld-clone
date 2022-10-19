@@ -2,12 +2,10 @@ const userService = require('../services/user.service');
 const ValidationError = require('../utils/validation-error');
 
 const register = async (req, res) => {
-  const { email, username, password } = req.body.user;
-
   try {
-    const newUser = await userService.createUser(email, username, password);
-
-    res.status(201).json(newUser);
+    const newUser = await userService.createUser(req.body.user);
+    const userResponse = await userService.buildUserResponse(newUser);
+    res.status(201).json(userResponse);
   } catch (err) {
     if (err instanceof ValidationError) {
       res.status(422).json(err.errorResponse);
@@ -19,11 +17,10 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { email, password } = req.body.user;
-
   try {
-    const user = await userService.login(email, password);
-    res.status(200).json(user);
+    const user = await userService.login(req.body.user);
+    const userResponse = await userService.buildUserResponse(user);
+    res.status(200).json(userResponse);
   } catch (err) {
     if (err instanceof ValidationError) {
       res.status(422).json(err.errorResponse);
@@ -35,8 +32,24 @@ const login = async (req, res) => {
 };
 
 const getCurrentUser = async (req, res) => {
-  const user = await userService.buildUserResponse(req.user);
-  res.status(200).json(user);
+  try {
+    const userResponse = await userService.buildUserResponse(req.user);
+    res.status(200).json(userResponse);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Something went wrong.');
+  }
 };
 
-module.exports = { register, login, getCurrentUser };
+const updateUser = async (req, res) => {
+  try {
+    const updatedUser = await userService.updateUser(req.user, req.body.user);
+    const userResponse = await userService.buildUserResponse(updatedUser);
+    res.status(200).json(userResponse);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Something went wrong.');
+  }
+};
+
+module.exports = { register, login, getCurrentUser, updateUser };

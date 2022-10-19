@@ -19,7 +19,7 @@ const buildUserResponse = async ({ username, email, bio, image }) => {
   return userResponse;
 };
 
-const createUser = async (email, username, password) => {
+const createUser = async ({ email, username, password }) => {
   const errorResponse = { errors: {} };
 
   let candidate = await User.findOne({ where: { email } });
@@ -43,16 +43,14 @@ const createUser = async (email, username, password) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const newUser = await User.create(
+  return (newUser = await User.create(
     { username, email, password: hashedPassword },
     { raw: true }
-  );
-
-  return buildUserResponse(newUser);
+  ));
 };
 
-const login = async (email, password) => {
-  const candidate = await (await User.findOne({ where: { email } }))?.toJSON();
+const login = async ({ email, password }) => {
+  const candidate = await User.findOne({ where: { email }, raw: true });
 
   if (!candidate) {
     throw new ValidationError('Email or password is invalid', {
@@ -68,11 +66,37 @@ const login = async (email, password) => {
     });
   }
 
-  return buildUserResponse(candidate);
+  return candidate;
+};
+
+const updateUser = async (user, { email, username, password, image, bio }) => {
+  if (email) {
+    user.email = email;
+  }
+
+  if (username) {
+    user.username = username;
+  }
+
+  if (password) {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+  }
+
+  if (image) {
+    user.image = image;
+  }
+
+  if (bio) {
+    user.bio = bio;
+  }
+
+  return user.save();
 };
 
 module.exports = {
   createUser,
   login,
+  updateUser,
   buildUserResponse,
 };

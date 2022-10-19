@@ -39,4 +39,16 @@ router.post(
 
 router.get('/user', authRequiredMiddleware, userController.getCurrentUser);
 
+router.put(
+  '/user',
+  body('user.email').trim().optional({ checkFalsy: true }).isEmail(),
+  body('user.username').trim(),
+  body('user.bio').trim(),
+  body('user.image').trim(),
+  body('user.password').trim(),
+  authRequiredMiddleware,
+  checkValidationErrors,
+  userController.updateUser
+);
+
 module.exports = router;
