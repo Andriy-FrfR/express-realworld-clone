@@ -1,7 +1,23 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/user.model');
 const ValidationError = require('../utils/validation-error');
-const buildUserResponse = require('../utils/build-user-response');
+const jwt = require('jsonwebtoken');
+
+const buildUserResponse = async ({ username, email, bio, image }) => {
+  const token = await jwt.sign(username, process.env.JWT_SECRET);
+
+  const userResponse = {
+    user: {
+      username,
+      email,
+      bio,
+      image: image || 'https://api.realworld.io/images/smiley-cyrus.jpg',
+      token,
+    },
+  };
+
+  return userResponse;
+};
 
 const createUser = async (email, username, password) => {
   const errorResponse = { errors: {} };
@@ -27,9 +43,10 @@ const createUser = async (email, username, password) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const newUser = await (
-    await User.create({ username, email, password: hashedPassword })
-  ).toJSON();
+  const newUser = await User.create(
+    { username, email, password: hashedPassword },
+    { raw: true }
+  );
 
   return buildUserResponse(newUser);
 };
@@ -37,20 +54,25 @@ const createUser = async (email, username, password) => {
 const login = async (email, password) => {
   const candidate = await (await User.findOne({ where: { email } }))?.toJSON();
 
-  if (candidate) {
-    const arePasswordsSame = await bcrypt.compare(password, candidate.password);
-
-    if (arePasswordsSame) {
-      return buildUserResponse(candidate);
-    }
+  if (!candidate) {
+    throw new ValidationError('Email or password is invalid', {
+      errors: { 'email or password': 'is invalid' },
+    });
   }
 
-  throw new ValidationError('Email or password is invalid', {
-    errors: { 'email or password': 'is invalid' },
-  });
+  const arePasswordsSame = await bcrypt.compare(password, candidate.password);
+
+  if (!arePasswordsSame) {
+    throw new ValidationError('Email or password is invalid', {
+      errors: { 'email or password': 'is invalid' },
+    });
+  }
+
+  return buildUserResponse(candidate);
 };
 
 module.exports = {
   createUser,
   login,
+  buildUserResponse,
 };
