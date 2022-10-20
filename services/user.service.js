@@ -3,6 +3,10 @@ const User = require('../models/user.model');
 const ValidationError = require('../utils/validation-error');
 const jwt = require('jsonwebtoken');
 
+const getUserByUsername = async (username) => {
+  return User.findByPk(username);
+};
+
 const buildUserResponse = async ({ username, email, bio, image }) => {
   const token = await jwt.sign(username, process.env.JWT_SECRET);
 
@@ -28,7 +32,7 @@ const createUser = async ({ email, username, password }) => {
     errorResponse.errors.email = ['has already been taken'];
   }
 
-  candidate = await User.findOne({ where: { username } });
+  candidate = await getUserByUsername(username);
 
   if (candidate) {
     errorResponse.errors.username = ['has already been taken'];
@@ -99,4 +103,5 @@ module.exports = {
   login,
   updateUser,
   buildUserResponse,
+  getUserByUsername,
 };
