@@ -4,11 +4,11 @@ const ValidationError = require('../utils/validation-error');
 const jwt = require('jsonwebtoken');
 
 const findUserByUsername = async (username) => {
-  return User.findByPk(username);
+  return User.findOne({ where: { username } });
 };
 
-const buildUserResponse = async ({ username, email, bio, image }) => {
-  const token = await jwt.sign(username, process.env.JWT_SECRET);
+const buildUserResponse = async ({ id, username, email, bio, image }) => {
+  const token = await jwt.sign(id, process.env.JWT_SECRET);
 
   const userResponse = {
     user: {
@@ -47,10 +47,10 @@ const createUser = async ({ email, username, password }) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  return (newUser = await User.create(
+  return await User.create(
     { username, email, password: hashedPassword },
     { raw: true }
-  ));
+  );
 };
 
 const login = async ({ email, password }) => {

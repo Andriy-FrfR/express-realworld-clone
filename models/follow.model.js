@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
-const User = require('./user.model');
 
 const Follow = sequelize.define('follows', {
   id: {
@@ -8,12 +7,12 @@ const Follow = sequelize.define('follows', {
     autoIncrement: true,
     primaryKey: true,
   },
-  followerUsername: {
-    type: DataTypes.STRING,
+  followerId: {
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
-  followedUsername: {
-    type: DataTypes.STRING,
+  followedId: {
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
 });

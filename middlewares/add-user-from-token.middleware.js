@@ -9,8 +9,8 @@ const addUserFromTokenMiddleware = async (req, res, next) => {
   }
 
   try {
-    const username = verify(token, process.env.JWT_SECRET);
-    const user = await User.findOne({ where: { username } });
+    const id = verify(token, process.env.JWT_SECRET);
+    const user = await User.findByPk(id);
     req.user = user;
     next();
   } catch (e) {

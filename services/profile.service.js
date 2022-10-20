@@ -3,19 +3,18 @@ const BadRequestError = require('../utils/bad-request-error');
 const userService = require('./user.service');
 const Follow = require('../models/follow.model');
 
-const buildProfileResponse = (profile) => {
+const buildProfileResponse = ({ username, bio, image, following }) => {
   return {
     profile: {
-      username: profile.username,
-      bio: profile.bio,
-      image:
-        profile.image || 'https://api.realworld.io/images/smiley-cyrus.jpg',
-      following: profile.following,
+      username,
+      bio,
+      image: image || 'https://api.realworld.io/images/smiley-cyrus.jpg',
+      following,
     },
   };
 };
 
-const getProfile = async (username, currentUserUsername) => {
+const getProfile = async (username, currentUserId) => {
   const user = (await userService.findUserByUsername(username))?.toJSON();
 
   if (!user) {
@@ -24,11 +23,11 @@ const getProfile = async (username, currentUserUsername) => {
 
   let following = false;
 
-  if (currentUserUsername) {
+  if (currentUserId) {
     const follow = await Follow.findOne({
       where: {
-        followerUsername: currentUserUsername,
-        followedUsername: username,
+        followerId: currentUserId,
+        followedId: user.id,
       },
     });
 
@@ -40,35 +39,35 @@ const getProfile = async (username, currentUserUsername) => {
   return { ...user, following };
 };
 
-const followUser = async (username, currentUserUsername) => {
-  if (username === currentUserUsername) {
-    throw new BadRequestError("You can't follow yourself");
-  }
-
+const followUser = async (username, currentUserId) => {
   const user = (await userService.findUserByUsername(username))?.toJSON();
 
   if (!user) {
     throw new NotFoundError('There is no user with such username');
   }
 
+  if (user.id === currentUserId) {
+    throw new BadRequestError("You can't follow yourself");
+  }
+
   const follow = await Follow.findOne({
     where: {
-      followerUsername: currentUserUsername,
-      followedUsername: username,
+      followerId: currentUserId,
+      followedId: user.id,
     },
   });
 
   if (!follow) {
     await Follow.create({
-      followerUsername: currentUserUsername,
-      followedUsername: username,
+      followerId: currentUserId,
+      followedId: user.id,
     });
   }
 
   return { ...user, following: true };
 };
 
-const unfollowUser = async (username, currentUserUsername) => {
+const unfollowUser = async (username, currentUserId) => {
   const user = (await userService.findUserByUsername(username))?.toJSON();
 
   if (!user) {
@@ -77,8 +76,8 @@ const unfollowUser = async (username, currentUserUsername) => {
 
   const follow = await Follow.findOne({
     where: {
-      followerUsername: currentUserUsername,
-      followedUsername: username,
+      followerId: currentUserId,
+      followedId: user.id,
     },
   });
 

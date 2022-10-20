@@ -6,7 +6,7 @@ const getProfile = async (req, res) => {
   try {
     const profile = await profileService.getProfile(
       req.params['username'],
-      req['user']?.username
+      req['user']?.id
     );
     const profileResponse = profileService.buildProfileResponse(profile);
 
@@ -25,7 +25,7 @@ const followUser = async (req, res) => {
   try {
     const profile = await profileService.followUser(
       req.params.username,
-      req.user.username
+      req.user.id
     );
     const profileResponse = profileService.buildProfileResponse(profile);
 
@@ -46,7 +46,7 @@ const unfollowUser = async (req, res) => {
   try {
     const profile = await profileService.unfollowUser(
       req.params.username,
-      req.user.username
+      req.user.id
     );
     const profileResponse = profileService.buildProfileResponse(profile);
 
