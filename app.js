@@ -15,6 +15,6 @@ app.use(addUserFromTokenMiddleware);
 /*Routes*/
 app.use('/api', userRoutes);
 app.use('/api', tagRoutes);
-app.use('/api', profileRoutes);
+app.use('/api/profiles', profileRoutes);
 
 module.exports = app;

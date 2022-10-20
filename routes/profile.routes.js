@@ -1,7 +1,14 @@
 const { Router } = require('express');
 const router = Router();
 const profileController = require('../controllers/profile.controller');
+const authRequiredMiddleware = require('../middlewares/auth-required.middleware');
 
-router.get('/profiles/:username', profileController.getProfile);
+router.get('/:username', profileController.getProfile);
+
+router.post(
+  '/:username/follow',
+  authRequiredMiddleware,
+  profileController.followUser
+);
 
 module.exports = router;

@@ -1,5 +1,6 @@
 const NotFoundError = require('../utils/not-found-error');
 const userService = require('./user.service');
+const Follow = require('../models/follow.model');
 
 const buildProfileResponse = (profile) => {
   return {
@@ -14,15 +15,52 @@ const buildProfileResponse = (profile) => {
 };
 
 const getProfile = async (username, currentUserUsername) => {
-  const user = (await userService.getUserByUsername(username)).toJSON();
+  const user = (await userService.findUserByUsername(username))?.toJSON();
 
   if (!user) {
     throw new NotFoundError('There is no user with such username');
   }
 
-  const following = false;
+  let following = false;
+
+  if (currentUserUsername) {
+    const follow = await Follow.findOne({
+      where: {
+        followerUsername: currentUserUsername,
+        followedUsername: username,
+      },
+    });
+
+    if (follow) {
+      following = true;
+    }
+  }
 
   return { ...user, following };
 };
 
-module.exports = { getProfile, buildProfileResponse };
+const followUser = async (username, currentUserUsername) => {
+  const user = (await userService.findUserByUsername(username))?.toJSON();
+
+  if (!user) {
+    throw new NotFoundError('There is no user with such username');
+  }
+
+  const follow = await Follow.findOne({
+    where: {
+      followerUsername: currentUserUsername,
+      followedUsername: username,
+    },
+  });
+
+  if (!follow) {
+    await Follow.create({
+      followerUsername: currentUserUsername,
+      followedUsername: username,
+    });
+  }
+
+  return { ...user, following: true };
+};
+
+module.exports = { getProfile, followUser, buildProfileResponse };

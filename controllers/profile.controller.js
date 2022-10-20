@@ -20,4 +20,23 @@ const getProfile = async (req, res) => {
   }
 };
 
-module.exports = { getProfile };
+const followUser = async (req, res) => {
+  try {
+    const profile = await profileService.followUser(
+      req.params.username,
+      req.user.username
+    );
+    const profileResponse = profileService.buildProfileResponse(profile);
+
+    res.status(200).json(profileResponse);
+  } catch (err) {
+    if (err instanceof NotFoundError) {
+      res.status(404).end(err.message);
+    } else {
+      console.error(err);
+      res.status(500).end('Something went wrong.');
+    }
+  }
+};
+
+module.exports = { getProfile, followUser };
