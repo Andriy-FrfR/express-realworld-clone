@@ -1,4 +1,5 @@
 const NotFoundError = require('../utils/not-found-error');
+const BadRequestError = require('../utils/bad-request-error');
 const userService = require('./user.service');
 const Follow = require('../models/follow.model');
 
@@ -40,6 +41,10 @@ const getProfile = async (username, currentUserUsername) => {
 };
 
 const followUser = async (username, currentUserUsername) => {
+  if (username === currentUserUsername) {
+    throw new BadRequestError("You can't follow yourself");
+  }
+
   const user = (await userService.findUserByUsername(username))?.toJSON();
 
   if (!user) {

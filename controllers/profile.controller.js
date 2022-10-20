@@ -1,4 +1,5 @@
 const NotFoundError = require('../utils/not-found-error');
+const BadRequestError = require('../utils/bad-request-error');
 const profileService = require('../services/profile.service');
 
 const getProfile = async (req, res) => {
@@ -32,6 +33,8 @@ const followUser = async (req, res) => {
   } catch (err) {
     if (err instanceof NotFoundError) {
       res.status(404).end(err.message);
+    } else if (err instanceof BadRequestError) {
+      res.status(400).end(err.message);
     } else {
       console.error(err);
       res.status(500).end('Something went wrong.');
