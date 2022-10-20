@@ -11,4 +11,10 @@ router.post(
   profileController.followUser
 );
 
+router.delete(
+  '/:username/follow',
+  authRequiredMiddleware,
+  profileController.unfollowUser
+);
+
 module.exports = router;
