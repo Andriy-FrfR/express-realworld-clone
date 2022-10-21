@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
-const User = require('../models/user.model');
-const ValidationError = require('../utils/validation-error');
+const User = require('./user.model');
+const ValidationError = require('../../utils/validation-error');
 const jwt = require('jsonwebtoken');
 
 const findUserByUsername = async (username) => {

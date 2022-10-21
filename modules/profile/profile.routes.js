@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const router = Router();
-const profileController = require('../controllers/profile.controller');
-const authRequiredMiddleware = require('../middlewares/auth-required.middleware');
+const profileController = require('./profile.controller');
+const authRequiredMiddleware = require('../../middlewares/auth-required.middleware');
 
 router.get('/:username', profileController.getProfile);
 

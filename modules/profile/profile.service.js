@@ -1,7 +1,7 @@
-const NotFoundError = require('../utils/not-found-error');
-const BadRequestError = require('../utils/bad-request-error');
-const userService = require('./user.service');
-const Follow = require('../models/follow.model');
+const NotFoundError = require('../../utils/not-found-error');
+const BadRequestError = require('../../utils/bad-request-error');
+const userService = require('../user/user.service');
+const Follow = require('./follow.model');
 
 const buildProfileResponse = ({ username, bio, image, following }) => {
   return {

@@ -1,4 +1,4 @@
-const Tag = require('../models/tag.model');
+const Tag = require('./tag.model');
 
 const findAll = () => {
   return Tag.findAll({ raw: true });

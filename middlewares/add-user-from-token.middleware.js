@@ -1,5 +1,5 @@
 const { verify } = require('jsonwebtoken');
-const User = require('../models/user.model');
+const User = require('../modules/user/user.model');
 
 const addUserFromTokenMiddleware = async (req, res, next) => {
   const token = req.get('Authorization')?.split(' ')[1];

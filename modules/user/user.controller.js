@@ -1,5 +1,5 @@
-const userService = require('../services/user.service');
-const ValidationError = require('../utils/validation-error');
+const userService = require('./user.service');
+const ValidationError = require('../../utils/validation-error');
 
 const register = async (req, res) => {
   try {

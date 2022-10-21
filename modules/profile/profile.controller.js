@@ -1,6 +1,6 @@
-const NotFoundError = require('../utils/not-found-error');
-const BadRequestError = require('../utils/bad-request-error');
-const profileService = require('../services/profile.service');
+const NotFoundError = require('../../utils/not-found-error');
+const BadRequestError = require('../../utils/bad-request-error');
+const profileService = require('./profile.service');
 
 const getProfile = async (req, res) => {
   try {
